@@ -1,7 +1,8 @@
-import { Html, Line } from '@react-three/drei'
+import { DragControls, Html, Line } from '@react-three/drei'
 import { useFrame, type ThreeEvent } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
-import { Box3, Box3Helper, BufferGeometry, DoubleSide, EdgesGeometry, Group, MathUtils, Vector3 } from 'three'
+import { Box3, Box3Helper, BufferGeometry, DoubleSide, EdgesGeometry, Group, MathUtils, Matrix4, Vector3 } from 'three'
+import { ASSEMBLY_SNAP_DISTANCE } from '../config/classroomChallengeConfig'
 import { getClippingPlanes } from '../config/clippingConfig'
 import { CULVERT_COLORS } from '../config/colors'
 import { getExplodeOffset } from '../config/explodeConfig'
@@ -30,11 +31,16 @@ export function ComponentMesh({ id, name, color, geometry, position = [0, 0, 0] 
   const transparencyMode = useCulvertStore((state) => state.transparencyMode)
   const clippingMode = useCulvertStore((state) => state.clippingMode)
   const bottomViewEnabled = useCulvertStore((state) => state.bottomViewEnabled)
+  const assemblyChallengeActive = useCulvertStore((state) => state.assemblyChallengeActive)
+  const assembledComponentIds = useCulvertStore((state) => state.assembledComponentIds)
+  const assemblyResetSequence = useCulvertStore((state) => state.assemblyResetSequence)
+  const finishAssemblyDrag = useCulvertStore((state) => state.finishAssemblyDrag)
   const setHoveredComponentId = useCulvertStore((state) => state.setHoveredComponentId)
   const setSelectedComponentId = useCulvertStore((state) => state.setSelectedComponentId)
   const hovered = hoveredComponentId === id
   const selected = selectedComponentId === id
   const spotlighted = spotlightComponentIds?.includes(id) ?? false
+  const assembled = assembledComponentIds.includes(id)
   const dimmed = (isolationEnabled && selectedComponentId !== null && !selected)
     || (spotlightComponentIds !== null && !spotlighted)
   const visible = componentVisible && (!bottomViewEnabled || id === 'bottom-slab')
@@ -47,10 +53,19 @@ export function ComponentMesh({ id, name, color, geometry, position = [0, 0, 0] 
   }, [geometry])
   const center = useMemo(() => bounds.getCenter(new Vector3()), [bounds])
   const helper = useMemo(() => new Box3Helper(bounds, 0x78dcff), [bounds])
+  const shouldStartExploded = assemblyChallengeActive && !assembled
+  const dragMatrix = useMemo(() => {
+    if (!shouldStartExploded) return new Matrix4()
+    const offset = getExplodeOffset(id, 1)
+    return new Matrix4().makeTranslation(...offset)
+    // DragControls mutates this matrix; the reset sequence intentionally creates a fresh instance.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assemblyResetSequence, id, shouldStartExploded])
+  const dragPosition = useRef(new Vector3())
 
   useFrame((_, delta) => {
     if (!groupRef.current) return
-    const offset = getExplodeOffset(id, useCulvertStore.getState().explodeProgress)
+    const offset = assemblyChallengeActive ? [0, 0, 0] : getExplodeOffset(id, useCulvertStore.getState().explodeProgress)
     groupRef.current.position.set(
       position[0] + offset[0],
       position[1] + offset[1],
@@ -75,7 +90,7 @@ export function ComponentMesh({ id, name, color, geometry, position = [0, 0, 0] 
     setSelectedComponentId(id)
   }
 
-  return (
+  const component = (
     <group ref={groupRef} visible={visible} position={position} name={id} userData={{ componentId: id }}>
       <mesh
         geometry={geometry}
@@ -87,8 +102,8 @@ export function ComponentMesh({ id, name, color, geometry, position = [0, 0, 0] 
       >
         <meshStandardMaterial
           color={color}
-          emissive={selected ? '#54e9ff' : hovered ? '#1ba9c5' : spotlighted ? '#9a7415' : '#000000'}
-          emissiveIntensity={selected ? bottomViewEnabled ? 0.12 : 0.48 : hovered ? 0.3 : spotlighted ? 0.18 : 0}
+          emissive={assembled ? '#39d98a' : selected ? '#54e9ff' : hovered ? '#1ba9c5' : spotlighted ? '#9a7415' : '#000000'}
+          emissiveIntensity={assembled ? 0.3 : selected ? bottomViewEnabled ? 0.12 : 0.48 : hovered ? 0.3 : spotlighted ? 0.18 : 0}
           roughness={0.72}
           metalness={0.03}
           side={DoubleSide}
@@ -128,5 +143,20 @@ export function ComponentMesh({ id, name, color, geometry, position = [0, 0, 0] 
         </>
       )}
     </group>
+  )
+
+  if (!assemblyChallengeActive || assembled) return component
+  return (
+    <DragControls
+      matrix={dragMatrix}
+      onDragStart={(origin) => {
+        dragPosition.current.copy(origin)
+        setSelectedComponentId(id)
+      }}
+      onDrag={(localMatrix) => dragPosition.current.setFromMatrixPosition(localMatrix)}
+      onDragEnd={() => finishAssemblyDrag(id, dragPosition.current.length() <= ASSEMBLY_SNAP_DISTANCE)}
+    >
+      {component}
+    </DragControls>
   )
 }

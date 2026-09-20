@@ -1,10 +1,11 @@
-import { BookOpenCheck, GraduationCap, Grid2X2, Info } from 'lucide-react'
+import { BookOpenCheck, GraduationCap, Grid2X2, Info, Trophy } from 'lucide-react'
 import { useEffect } from 'react'
 import { ProjectionWorkspace } from '../projection/ProjectionWorkspace'
 import { CulvertScene } from '../scene/CulvertScene'
 import { useCulvertStore } from '../store/useCulvertStore'
 import { ComponentInfoCard } from '../ui/ComponentInfoCard'
 import { ComponentTree } from '../ui/ComponentTree'
+import { ClassroomChallenge } from '../ui/ClassroomChallenge'
 import { DebugPanel } from '../ui/DebugPanel'
 import { ExplodeControls } from '../ui/ExplodeControls'
 import { GuidedTour } from '../ui/GuidedTour'
@@ -17,6 +18,8 @@ export default function App() {
   const setWorkspaceMode = useCulvertStore((state) => state.setWorkspaceMode)
   const guidedTourActive = useCulvertStore((state) => state.guidedTourActive)
   const startGuidedTour = useCulvertStore((state) => state.startGuidedTour)
+  const classroomChallengeActive = useCulvertStore((state) => state.classroomChallengeActive)
+  const startClassroomChallenge = useCulvertStore((state) => state.startClassroomChallenge)
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -41,10 +44,10 @@ export default function App() {
             <span className="text-[10px] font-semibold uppercase tracking-[.24em]">Engineering Graphics Lab</span>
           </div>
           <h1 className="text-xl font-semibold tracking-wide text-slate-50">涵洞三维结构教学</h1>
-          <p className="mt-1 text-xs text-slate-500">Phase 6A · 5 分钟结构导览</p>
+          <p className="mt-1 text-xs text-slate-500">Phase 6B · 课堂挑战</p>
         </div>
         <div className="flex items-start gap-2">
-          {!guidedTourActive && (
+          {!guidedTourActive && !classroomChallengeActive && (
             <button
               type="button"
               onClick={startGuidedTour}
@@ -53,7 +56,16 @@ export default function App() {
               <GraduationCap size={15} /> 开始 5 分钟结构导览
             </button>
           )}
-          {workspaceMode === 'model' && !guidedTourActive && (
+          {!guidedTourActive && !classroomChallengeActive && (
+            <button
+              type="button"
+              onClick={startClassroomChallenge}
+              className="glass pointer-events-auto flex items-center gap-2 rounded-xl px-3 py-2 text-xs text-amber-100 transition hover:border-amber-300/35 hover:bg-amber-300/10"
+            >
+              <Trophy size={15} /> 进入课堂挑战
+            </button>
+          )}
+          {workspaceMode === 'model' && !guidedTourActive && !classroomChallengeActive && (
             <button
               type="button"
               onClick={() => setWorkspaceMode('projection')}
@@ -71,7 +83,7 @@ export default function App() {
 
       {workspaceMode === 'model' ? (
         <>
-          {!guidedTourActive && (
+          {!guidedTourActive && !classroomChallengeActive && (
             <div className="pointer-events-none absolute inset-x-0 top-28 z-10 flex items-start justify-between px-5">
               <ComponentTree />
               <div className="flex max-h-[calc(100vh-10rem)] flex-col gap-3 overflow-y-auto pb-2">
@@ -81,7 +93,7 @@ export default function App() {
             </div>
           )}
 
-          {!guidedTourActive && (
+          {!guidedTourActive && !classroomChallengeActive && (
             <div className="pointer-events-none absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2">
               <TeachingControls />
               <ExplodeControls />
@@ -97,6 +109,7 @@ export default function App() {
         <ProjectionWorkspace />
       )}
       <GuidedTour />
+      <ClassroomChallenge />
     </main>
   )
 }

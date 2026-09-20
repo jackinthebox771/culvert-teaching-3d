@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import {
   COMPONENT_IDS,
   type CameraPresetId,
+  type ChallengeMode,
   type ClippingMode,
   type CulvertComponentId,
   type DimensionMode,
@@ -35,6 +36,12 @@ interface CulvertState {
   spotlightComponentIds: CulvertComponentId[] | null
   guidedTourActive: boolean
   guidedTourStep: number
+  classroomChallengeActive: boolean
+  challengeMode: ChallengeMode
+  assemblyChallengeActive: boolean
+  assembledComponentIds: CulvertComponentId[]
+  assemblyResetSequence: number
+  assemblyLastResult: { componentId: CulvertComponentId; snapped: boolean; sequence: number } | null
   visibility: Record<CulvertComponentId, boolean>
   toggleDebug: () => void
   setDebugOption: (key: 'axesVisible' | 'gridVisible' | 'originsVisible' | 'boundingBoxesVisible' | 'labelsVisible', value: boolean) => void
@@ -62,6 +69,13 @@ interface CulvertState {
   startGuidedTour: () => void
   setGuidedTourStep: (step: number) => void
   stopGuidedTour: () => void
+  startClassroomChallenge: () => void
+  stopClassroomChallenge: () => void
+  setChallengeMode: (mode: ChallengeMode) => void
+  setChallengeSpotlight: (ids: CulvertComponentId[] | null) => void
+  startAssemblyChallenge: () => void
+  resetAssemblyChallenge: () => void
+  finishAssemblyDrag: (id: CulvertComponentId, snapped: boolean) => void
 }
 
 const initialVisibility = Object.fromEntries(COMPONENT_IDS.map((id) => [id, true])) as Record<CulvertComponentId, boolean>
@@ -92,6 +106,12 @@ export const useCulvertStore = create<CulvertState>((set) => ({
   spotlightComponentIds: null,
   guidedTourActive: false,
   guidedTourStep: 0,
+  classroomChallengeActive: false,
+  challengeMode: 'identify',
+  assemblyChallengeActive: false,
+  assembledComponentIds: [],
+  assemblyResetSequence: 0,
+  assemblyLastResult: null,
   visibility: initialVisibility,
   toggleDebug: () => set((state) => ({ debugEnabled: !state.debugEnabled })),
   setDebugOption: (key, value) => set({ [key]: value }),
@@ -318,5 +338,128 @@ export const useCulvertStore = create<CulvertState>((set) => ({
     clippingMode: 'off',
     dimensionMode: 'off',
     bottomViewEnabled: false,
+  }),
+  startClassroomChallenge: () => set({
+    classroomChallengeActive: true,
+    challengeMode: 'identify',
+    assemblyChallengeActive: false,
+    assembledComponentIds: [],
+    assemblyResetSequence: 0,
+    assemblyLastResult: null,
+    guidedTourActive: false,
+    workspaceMode: 'model',
+    selectedComponentId: null,
+    hoveredComponentId: null,
+    isolationEnabled: false,
+    cameraPreset: 'isometric',
+    cameraFocusRequest: null,
+    spotlightComponentIds: null,
+    explodeProgress: 0,
+    explodeTarget: 0,
+    explodeAnimating: false,
+    autoDemoPlaying: false,
+    transparencyMode: 'solid',
+    clippingMode: 'off',
+    dimensionMode: 'off',
+    bottomViewEnabled: false,
+    visibility: initialVisibility,
+    labelsVisible: false,
+    originsVisible: false,
+    boundingBoxesVisible: false,
+  }),
+  stopClassroomChallenge: () => set({
+    classroomChallengeActive: false,
+    challengeMode: 'identify',
+    assemblyChallengeActive: false,
+    assembledComponentIds: [],
+    assemblyResetSequence: 0,
+    assemblyLastResult: null,
+    workspaceMode: 'model',
+    selectedComponentId: null,
+    hoveredComponentId: null,
+    isolationEnabled: false,
+    cameraPreset: 'isometric',
+    cameraFocusRequest: null,
+    spotlightComponentIds: null,
+    explodeProgress: 0,
+    explodeTarget: 0,
+    explodeAnimating: false,
+    autoDemoPlaying: false,
+    transparencyMode: 'solid',
+    clippingMode: 'off',
+    dimensionMode: 'off',
+    bottomViewEnabled: false,
+    visibility: initialVisibility,
+    labelsVisible: true,
+  }),
+  setChallengeMode: (challengeMode) => set({
+    challengeMode,
+    assemblyChallengeActive: false,
+    assembledComponentIds: [],
+    assemblyResetSequence: 0,
+    assemblyLastResult: null,
+    workspaceMode: 'model',
+    selectedComponentId: null,
+    hoveredComponentId: null,
+    isolationEnabled: false,
+    cameraPreset: 'isometric',
+    cameraFocusRequest: null,
+    spotlightComponentIds: null,
+    explodeProgress: 0,
+    explodeTarget: 0,
+    explodeAnimating: false,
+    autoDemoPlaying: false,
+    transparencyMode: 'solid',
+    clippingMode: 'off',
+    dimensionMode: 'off',
+    bottomViewEnabled: false,
+    visibility: initialVisibility,
+    labelsVisible: false,
+  }),
+  setChallengeSpotlight: (spotlightComponentIds) => set({ spotlightComponentIds }),
+  startAssemblyChallenge: () => set((state) => ({
+    challengeMode: 'assembly',
+    assemblyChallengeActive: true,
+    assembledComponentIds: [],
+    assemblyResetSequence: state.assemblyResetSequence + 1,
+    assemblyLastResult: null,
+    selectedComponentId: null,
+    hoveredComponentId: null,
+    spotlightComponentIds: null,
+    isolationEnabled: false,
+    cameraPreset: 'isometric',
+    explodeProgress: 1,
+    explodeTarget: 1,
+    explodeAnimating: false,
+    autoDemoPlaying: false,
+  })),
+  resetAssemblyChallenge: () => set((state) => ({
+    assemblyChallengeActive: true,
+    assembledComponentIds: [],
+    assemblyResetSequence: state.assemblyResetSequence + 1,
+    assemblyLastResult: null,
+    selectedComponentId: null,
+    hoveredComponentId: null,
+    spotlightComponentIds: null,
+    cameraPreset: 'isometric',
+    explodeProgress: 1,
+    explodeTarget: 1,
+    explodeAnimating: false,
+  })),
+  finishAssemblyDrag: (componentId, snapped) => set((state) => {
+    const assembledComponentIds = snapped && !state.assembledComponentIds.includes(componentId)
+      ? [...state.assembledComponentIds, componentId]
+      : state.assembledComponentIds
+    const complete = assembledComponentIds.length === COMPONENT_IDS.length
+    return {
+      assembledComponentIds,
+      explodeProgress: complete ? 0 : state.explodeProgress,
+      explodeTarget: complete ? 0 : state.explodeTarget,
+      assemblyLastResult: {
+        componentId,
+        snapped,
+        sequence: (state.assemblyLastResult?.sequence ?? 0) + 1,
+      },
+    }
   }),
 }))
