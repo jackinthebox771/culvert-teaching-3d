@@ -131,7 +131,7 @@ export function ClassroomChallenge() {
   const activeModeInfo = CHALLENGE_MODES.find((item) => item.id === mode) ?? CHALLENGE_MODES[0]
 
   return (
-    <aside className="glass pointer-events-auto absolute bottom-5 right-5 top-24 z-40 flex w-[410px] flex-col overflow-hidden rounded-2xl border-cyan-300/25 shadow-2xl">
+    <aside className="glass pointer-events-auto absolute bottom-2 left-2 right-2 top-[42dvh] z-40 flex flex-col overflow-hidden rounded-2xl border-cyan-300/25 shadow-2xl md:bottom-5 md:left-auto md:right-5 md:top-24 md:w-[410px]">
       <div className="flex items-start justify-between border-b border-white/8 px-4 py-3">
         <div>
           <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[.18em] text-amber-300"><Trophy size={14} /> 工程制图课堂挑战</div>
@@ -178,8 +178,8 @@ export function ClassroomChallenge() {
 
         {mode === 'projection-to-model' && (
           <div>
-            <p className="text-xs leading-5 text-slate-200">根据下方的{ORTHOGRAPHIC_VIEW_LABELS[projectionView]}轮廓，在左侧三维模型中点击对应构件。</p>
-            <ChallengeProjectionPreview componentId={target} view={projectionView} className="mt-3 h-44 border border-cyan-300/15" />
+            <p className="text-xs leading-5 text-slate-200">根据下方的{ORTHOGRAPHIC_VIEW_LABELS[projectionView]}轮廓，在三维模型中点击对应构件。</p>
+            <ChallengeProjectionPreview componentId={target} view={projectionView} className="mt-3 h-36 border border-cyan-300/15 sm:h-44" />
             <div className="mt-3 flex items-center gap-2 rounded-lg bg-cyan-400/5 px-3 py-2 text-[10px] text-cyan-100/70"><MousePointer2 size={13} /> 直接点击三维实体作答，可旋转后再判断</div>
           </div>
         )}

@@ -49,7 +49,7 @@ export function GuidedTour() {
   const content = TOUR_STEPS[step]
   const last = step === TOUR_STEPS.length - 1
   return (
-    <aside className="glass pointer-events-auto absolute bottom-5 left-1/2 z-50 w-[min(620px,calc(100vw-24px))] -translate-x-1/2 rounded-2xl border-cyan-300/25 p-4 shadow-2xl">
+    <aside className="glass pointer-events-auto absolute bottom-2 left-1/2 z-50 max-h-[68dvh] w-[min(620px,calc(100vw-16px))] -translate-x-1/2 overflow-y-auto rounded-2xl border-cyan-300/25 p-3 shadow-2xl sm:bottom-5 sm:w-[min(620px,calc(100vw-24px))] sm:p-4">
       <div className="flex items-start justify-between gap-4">
         <div className="flex min-w-0 items-start gap-3">
           <div className="mt-0.5 rounded-lg bg-cyan-400/12 p-2 text-cyan-300"><GraduationCap size={18} /></div>
@@ -64,8 +64,8 @@ export function GuidedTour() {
       </div>
       <p className="mt-3 text-xs leading-5 text-slate-300">{content.text}</p>
       <p className="mt-2 rounded-lg border border-amber-300/15 bg-amber-300/5 px-3 py-2 text-[11px] text-amber-100/80"><span className="font-semibold text-amber-300">制图观察：</span>{content.focus}</p>
-      <div className="mt-3 flex items-center gap-3">
-        <div className="flex flex-1 gap-1">
+      <div className="mt-3 flex flex-wrap items-center gap-2 sm:gap-3">
+        <div className="order-3 flex w-full gap-1 sm:order-none sm:w-auto sm:flex-1">
           {TOUR_STEPS.map((item, index) => (
             <button
               key={item.title}
