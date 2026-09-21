@@ -14,7 +14,7 @@ export function ComponentInfoCard() {
   const info = COMPONENT_INFO[selectedId]
 
   return (
-    <section className="glass pointer-events-auto w-80 rounded-2xl p-4" aria-live="polite">
+    <section className="glass pointer-events-auto w-72 rounded-xl p-3" aria-live="polite">
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="text-[10px] uppercase tracking-[.18em] text-cyan-400/70">已选构件</div>

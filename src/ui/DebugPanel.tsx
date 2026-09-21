@@ -13,14 +13,19 @@ const options = [
 export function DebugPanel() {
   const state = useCulvertStore()
   return (
-    <details className="glass pointer-events-auto w-80 rounded-2xl p-4" open>
-      <summary className="flex cursor-pointer list-none items-center justify-between text-sm font-semibold text-cyan-100">
+    <details className="glass pointer-events-auto w-72 rounded-xl p-3" open>
+      <summary className="flex cursor-pointer list-none items-center justify-between text-xs font-semibold text-cyan-100">
         <span className="flex items-center gap-2"><Bug size={16} className="text-amber-300" />Debug 模式</span>
         <ChevronDown size={14} />
       </summary>
-      <div className="mt-3 grid grid-cols-2 gap-2">
+      <div className="mt-3 flex items-center gap-1 border-b border-white/8 pb-2 text-[9px]">
+        <span className="rounded-md bg-cyan-400/15 px-2 py-1 text-cyan-200 ring-1 ring-inset ring-cyan-300/20">显示选项</span>
+        <span className="px-2 py-1 text-slate-600">模型信息</span>
+        <span className="ml-auto rounded-full bg-emerald-400/10 px-2 py-0.5 text-emerald-300/75">已核对</span>
+      </div>
+      <div className="mt-2 grid grid-cols-2 gap-1.5">
         {options.map(([key, label]) => (
-          <label key={key} className="flex cursor-pointer items-center gap-2 rounded-lg bg-white/[.025] px-2 py-1.5 text-[11px] text-slate-300">
+          <label key={key} className="flex cursor-pointer items-center gap-2 rounded-lg bg-white/[.025] px-2 py-1.5 text-[10px] text-slate-300">
             <input
               type="checkbox"
               checked={state[key]}
@@ -31,7 +36,7 @@ export function DebugPanel() {
           </label>
         ))}
       </div>
-      <div className="mt-3 space-y-1 border-t border-white/8 pt-3 font-mono text-[10px] leading-relaxed text-slate-400">
+      <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 border-t border-white/8 pt-2 font-mono text-[9px] leading-relaxed text-slate-400">
         <div><span className="text-slate-600">原点</span> X 0 · Y 0 · Z 0</div>
         <div><span className="text-slate-600">相机</span> {state.cameraTelemetry}</div>
         <div><span className="text-slate-600">爆炸</span> {(state.explodeProgress * 100).toFixed(0)}%{state.autoDemoPlaying ? ' · AUTO' : state.explodeAnimating ? ' · ANIMATING' : ''}</div>

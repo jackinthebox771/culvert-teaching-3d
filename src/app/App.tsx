@@ -7,11 +7,9 @@ import { ComponentInfoCard } from '../ui/ComponentInfoCard'
 import { ComponentTree } from '../ui/ComponentTree'
 import { ClassroomChallenge } from '../ui/ClassroomChallenge'
 import { DebugPanel } from '../ui/DebugPanel'
-import { ExplodeControls } from '../ui/ExplodeControls'
+import { EngineeringCommandDeck } from '../ui/EngineeringCommandDeck'
 import { GuidedTour } from '../ui/GuidedTour'
 import { MobileControls } from '../ui/MobileControls'
-import { TeachingControls } from '../ui/TeachingControls'
-import { ViewPresetBar } from '../ui/ViewPresetBar'
 
 export default function App() {
   const clearSelection = useCulvertStore((state) => state.clearSelection)
@@ -45,7 +43,11 @@ export default function App() {
             <span className="hidden text-[10px] font-semibold uppercase tracking-[.24em] sm:inline">Engineering Graphics Lab</span>
           </div>
           <h1 className="whitespace-nowrap text-base font-semibold tracking-wide text-slate-50 sm:text-xl">涵洞三维结构教学</h1>
-          <p className="mt-1 text-[10px] text-slate-500 sm:text-xs">Phase 6C · 移动端适配</p>
+          <div className="mt-1 flex items-center gap-2 text-[10px] sm:text-xs">
+            <span className="font-medium text-cyan-300/75">工程仪表盘</span>
+            <span className="text-slate-700">/</span>
+            <span className="text-slate-500">Phase 6C · 移动端适配</span>
+          </div>
         </div>
         <div className="flex items-start gap-1.5 sm:gap-2">
           {!guidedTourActive && !classroomChallengeActive && (
@@ -93,7 +95,7 @@ export default function App() {
           {!guidedTourActive && !classroomChallengeActive && (
             <div className="pointer-events-none absolute inset-x-0 top-28 z-10 hidden items-start justify-between px-5 md:flex">
               <ComponentTree />
-              <div className="flex max-h-[calc(100vh-10rem)] flex-col gap-3 overflow-y-auto pb-2">
+              <div className="flex max-h-[calc(100vh-18rem)] flex-col gap-3 overflow-y-auto pb-2">
                 <DebugPanel />
                 <ComponentInfoCard />
               </div>
@@ -101,16 +103,14 @@ export default function App() {
           )}
 
           {!guidedTourActive && !classroomChallengeActive && (
-            <div className="pointer-events-none absolute bottom-4 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-2 md:flex">
-              <TeachingControls />
-              <ExplodeControls />
-              <ViewPresetBar />
+            <div className="pointer-events-none absolute inset-x-5 bottom-4 z-10 hidden md:block">
+              <EngineeringCommandDeck />
             </div>
           )}
 
           {!guidedTourActive && !classroomChallengeActive && <MobileControls />}
 
-          <div className="pointer-events-none absolute bottom-5 left-5 hidden text-[10px] leading-relaxed text-slate-600 md:block">
+          <div className="pointer-events-none absolute bottom-44 left-5 hidden text-[9px] leading-relaxed text-slate-600 xl:block">
             左键旋转 · 点击构件选择 · Esc 取消<br />滚轮缩放 · 右键平移 · 坐标：X 横向 · Y 竖直 · Z 涵洞纵向
           </div>
         </>
