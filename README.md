@@ -4,13 +4,25 @@
 
 ## 运行
 
+### Windows 一键启动
+
+双击项目根目录的 `启动本地项目.cmd`。脚本会自动进入正确目录、检查环境、按需安装依赖，并以局域网可访问模式启动网页。
+
+完整说明与故障排查见：[docs/本地运行说明.md](docs/本地运行说明.md)。
+
+### 命令行启动
+
 ```bash
 npm install
-npm run dev
+npm run dev -- --host 0.0.0.0
 npm run lint
 npm run typecheck
 npm run build
 ```
+
+- 本机访问：`http://localhost:5173/culvert-teaching-3d/`
+- 手机访问：使用 Vite 启动信息中的 `Network` 地址。
+- 在线版本：<https://jackinthebox771.github.io/culvert-teaching-3d/>
 
 ## 坐标系
 
@@ -145,3 +157,7 @@ culvert
 
 - 开发控制台中 `THREE.Clock` 可能输出上游弃用警告；当前无运行时错误，不影响 Sprint 3 动画。
 - 生产包中的 Three.js/R3F 主块超过 Vite 默认 500 kB 提示阈值；后续教学模块增加时再按路由/功能动态加载。
+
+## 许可证
+
+本项目采用 [MIT License](LICENSE)，Copyright © 2026 jackinthebox771。
